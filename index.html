@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Pink Race 🏁</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&family=Caveat:wght@600&display=swap">
+<style>
+:root{--tx:#6b2948;--serif:'Cormorant Garamond',Georgia,serif;--hand:'Caveat','Segoe Script',cursive;box-sizing:border-box}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
+body{display:flex;justify-content:center;align-items:center;font-family:var(--serif);color:var(--tx);background:linear-gradient(120deg,#fff0f6,#ffd6e7,#ffb6d2,#ff8fb8);background-size:300% 300%;animation:bg 14s ease infinite}
+@keyframes bg{50%{background-position:100% 50%}}
+#g{position:relative;width:min(100vw,56.25vh);width:min(100vw,56.25dvh);aspect-ratio:9/16;overflow:hidden;background:#ffcfe0;box-shadow:0 0 60px rgba(217,79,131,.5);touch-action:none;user-select:none;-webkit-user-select:none}
+#cv{display:block;width:100%;height:100%}
+.zone{position:absolute;top:0;bottom:0;width:50%;z-index:2}#zl{left:0}#zr{right:0}
+#hint{position:absolute;z-index:3;bottom:14px;left:0;right:0;display:flex;justify-content:space-between;padding:0 28px;font-size:2.2rem;color:#fff;opacity:.55;pointer-events:none;text-shadow:0 0 12px #d94f83}
+/* overlays */
+.ov{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:22px;gap:18px;opacity:0;visibility:hidden;transition:opacity .8s,visibility .8s}
+.ov.on{opacity:1;visibility:visible}
+.glass{background:rgba(255,255,255,.55);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.85);border-radius:28px;box-shadow:0 20px 60px rgba(217,79,131,.35);padding:30px 24px;display:flex;flex-direction:column;gap:16px;align-items:center}
+h1,h2,p{margin:0}
+.big{font-size:clamp(2.4rem,11vw,3.6rem);font-style:italic;font-weight:600;line-height:1.05}
+.sm{font-size:1.15rem;opacity:.85;line-height:1.35}
+.btn{font:600 1.3rem var(--serif);color:#fff;border:0;border-radius:999px;padding:15px 34px;min-height:54px;cursor:pointer;background:linear-gradient(135deg,#ff8fb8,#d94f83);box-shadow:0 8px 28px rgba(217,79,131,.6);transition:transform .25s;animation:glow 2.4s infinite}
+.btn:hover{transform:scale(1.07)}.btn:active{transform:scale(.94)}
+@keyframes glow{70%{box-shadow:0 8px 28px rgba(217,79,131,.6),0 0 0 20px rgba(255,143,184,0)}}
+/* win */
+#win{background:radial-gradient(circle,rgba(255,240,246,.96),rgba(255,182,210,.96));gap:6px}
+#pv{width:min(86%,360px);overflow:visible;filter:drop-shadow(0 0 30px rgba(255,92,156,.7))}
+.ring{opacity:0;transform:scale(0) rotate(-60deg);transform-box:fill-box;transform-origin:center}
+#win.on .ring{animation:bl 1.5s cubic-bezier(.2,1.3,.4,1) both;animation-delay:calc(.5s + var(--d))}
+@keyframes bl{60%{opacity:1;transform:scale(1.08) rotate(5deg)}100%{opacity:1;transform:none}}
+#win.on #pv{animation:br 4s ease-in-out 3s infinite}
+@keyframes br{50%{transform:scale(1.05)}}
+#wm{font:600 clamp(2.4rem,11vw,3.4rem)/1.1 var(--hand);text-shadow:0 0 20px #fff}
+.rv{opacity:0;transform:translateY(14px);filter:blur(6px);transition:all 1.4s}.rv.v{opacity:1;transform:none;filter:none}
+.pe{position:absolute;top:-30px;width:14px;height:18px;border-radius:70% 0 70% 0;opacity:.85;animation:fall linear infinite;pointer-events:none}
+@keyframes fall{to{transform:translateY(115vh) rotate(540deg)}}
+</style>
+</head>
+<body>
+<div id="g">
+  <canvas id="cv"></canvas>
+  <div class="zone" id="zl"></div><div class="zone" id="zr"></div>
+  <div id="hint"><span>◀</span><span>▶</span></div>
+
+  <div class="ov on" id="start"><div class="glass">
+    <h1 class="big">Pink Race 🏁</h1>
+    <p class="sm">Beat the other cars to the finish line!</p>
+    <p class="sm">Hold the <b>left</b> or <b>right</b> side of the screen to steer (or use ← →).<br>Grab 💗 for a speed boost and dodge the cones 🚧</p>
+    <p class="sm">Win and a little surprise awaits 🌸</p>
+    <button class="btn" id="go">Start race</button>
+  </div></div>
+
+  <div class="ov" id="lose"><div class="glass">
+    <h2 class="big" style="font-size:2.6rem">So close! 🥺</h2>
+    <p class="sm">Try again... you've got this 💗</p>
+    <button class="btn" id="again">Try again 🏁</button>
+  </div></div>
+
+  <div class="ov" id="win">
+    <h2 class="big rv" id="wt" style="font-size:2.4rem">You won! 🏁</h2>
+    <svg id="pv" viewBox="-130 -130 260 260"></svg>
+    <p id="wm" class="rv">smile na ikawww hihi</p>
+    <button class="btn rv" id="again2" style="margin-top:8px">Play again 🏁</button>
+  </div>
+</div>
+
+<script>
+/* ============ EDIT ME ============ */
+const WIN_MESSAGE = "smile na ikawww hihi";   // shown with the big peony when she wins
+const RACE_LENGTH = 10000;                    // longer = longer race
+/* ================================= */
+const $=s=>document.querySelector(s),R=Math.random,sleep=ms=>new Promise(r=>setTimeout(r,ms));
+$('#wm').textContent=WIN_MESSAGE;
+const cv=$('#cv'),c=cv.getContext('2d'),W=360,H=640,RW=250,L=RACE_LENGTH,PS=H*.74;
+let K=1,st='ready',P,cars,obs,hts,part,winner,tm,cd,shake,keys={l:0,r:0};
+function rs(){const r=cv.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);cv.width=r.width*d;cv.height=r.height*d;K=cv.width/W}
+addEventListener('resize',rs);rs();
+
+/* ---------- input ---------- */
+['zl','zr'].forEach((id,i)=>{const e=$('#'+id),k=i?'r':'l';
+  e.addEventListener('pointerdown',()=>keys[k]=1);
+  ['pointerup','pointercancel','pointerleave'].forEach(t=>e.addEventListener(t,()=>keys[k]=0))});
+addEventListener('keydown',e=>{if(/left|^a$/i.test(e.key.replace('Arrow','')))keys.l=1;if(/right|^d$/i.test(e.key.replace('Arrow','')))keys.r=1});
+addEventListener('keyup',e=>{if(/left|^a$/i.test(e.key.replace('Arrow','')))keys.l=0;if(/right|^d$/i.test(e.key.replace('Arrow','')))keys.r=0});
+
+/* ---------- setup ---------- */
+function init(){
+  P={player:1,x:0,y:0,v:0,ang:0,boost:0,bump:0,fin:0,col:'#ff7eb3',sd:'#e0508a'};
+  cars=[P,...[['#6ea8ff','#4a82da',-70,60,245],['#ffd36e','#e0b043',0,110,252],['#b69cff','#8d72e0',70,160,260]]
+    .map(([col,sd,x,y,b],i)=>({col,sd,x,lx:x,y,v:0,base:b,ph:i*2,fin:0}))];
+  obs=[];hts=[];part=[];winner=null;tm=0;shake=0;cd=3.8;
+  for(let y=500;y<L-300;y+=330+R()*200)obs.push({x:(R()-.5)*(RW-50),y,h:0});
+  for(let y=700;y<L-300;y+=420+R()*250)hts.push({x:(R()-.5)*(RW-60),y,got:0});
+}
+function begin(){['start','lose','win'].forEach(i=>$('#'+i).classList.remove('on'));
+  document.querySelectorAll('.pe').forEach(e=>e.remove());['#wt','#wm','#again2'].forEach(s=>$(s).classList.remove('v'));
+  init();st='count'}
+$('#go').onclick=$('#again').onclick=$('#again2').onclick=begin;
+init();
+
+/* ---------- update ---------- */
+function burst(x,y,n,col){for(let i=0;i<n;i++)part.push({x,y,vx:(R()-.5)*160,vy:(R()-.5)*160,life:.6+R()*.4,col,s:2+R()*3})}
+function upd(dt){
+  if(st==='ready')return;
+  if(cd>-1)cd-=dt; if(st==='count'&&cd<=.8)st='race';
+  if(st==='count')return;
+  tm+=dt;shake=Math.max(0,shake-dt);P.bump=Math.max(0,P.bump-dt);
+  const ended=st==='end',dir=ended?0:keys.r-keys.l,off=Math.abs(P.x)>RW/2-10;
+  const mx=ended?90:(P.boost>0?390:310)*(off?.55:1);
+  P.v+=(mx-P.v)*Math.min(1,dt*1.8);
+  P.x=Math.max(-RW/2-35,Math.min(RW/2+35,P.x+dir*(170+P.v*.12)*dt));
+  P.ang+=(dir*.2-P.ang)*Math.min(1,dt*10);P.y+=P.v*dt;P.boost=Math.max(0,P.boost-dt);
+  if(P.boost>0)part.push({x:P.x+(R()-.5)*10,y:P.y-34,vx:(R()-.5)*30,vy:-60-R()*50,life:.4,col:'#ff9cc2',s:4});
+  for(const r of cars){if(r.player)continue;
+    const d=P.y-r.y,tv=(r.base+Math.max(-10,Math.min(30,d/400*15)))*(ended?.3:1);
+    r.v+=(tv-r.v)*Math.min(1,dt*2);r.y+=r.v*dt;
+    r.x=Math.max(-RW/2+22,Math.min(RW/2-22,r.lx+Math.sin(tm*.9+r.ph)*38));
+    const dx=r.x-P.x,dy=r.y-P.y;
+    if(!P.bump&&Math.abs(dx)<30&&Math.abs(dy)<56){P.bump=.5;P.v*=.82;P.x+=(dx>0?-1:1)*10;r.lx+=(dx>0?1:-1)*12;shake=.15;burst(P.x,P.y+30,6,'#fff')}}
+  for(const o of obs)if(!o.h&&Math.abs(o.x-P.x)<24&&Math.abs(o.y-P.y)<30){o.h=1;P.v*=.45;shake=.25;burst(o.x,o.y,10,'#ff9f43')}
+  for(const h of hts)if(!h.got&&Math.hypot(h.x-P.x,h.y-P.y)<32){h.got=1;P.boost=1.6;burst(h.x,h.y,16,'#ff5c9c')}
+  for(let i=part.length-1;i>=0;i--){const p=part[i];p.x+=p.vx*dt;p.y+=p.vy*dt;if((p.life-=dt)<=0)part.splice(i,1)}
+  for(const r of cars)if(!r.fin&&r.y>=L){r.fin=1;if(!winner){winner=r;st='end';setTimeout(finish,1000)}}
+}
+function finish(){winner===P?doWin():$('#lose').classList.add('on')}
+
+/* ---------- drawing ---------- */
+const sy=y=>PS-(y-P.y);
+function rr(x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+function car(x,y,col,sd,ang,pl){
+  c.save();c.translate(x,y);c.rotate(ang);
+  c.fillStyle='rgba(80,20,50,.2)';c.save();c.translate(4,6);rr(-18,-32,36,66,14);c.fill();c.restore();
+  c.fillStyle='#2b2030';[[-21,-20],[15,-20],[-21,12],[15,12]].forEach(([a,b])=>{rr(a,b,6,17,3);c.fill()});
+  const g=c.createLinearGradient(-17,0,17,0);g.addColorStop(0,sd);g.addColorStop(.5,col);g.addColorStop(1,sd);
+  c.fillStyle=g;rr(-17,-32,34,64,14);c.fill();
+  c.fillStyle='rgba(255,255,255,.4)';rr(-9,-28,18,15,8);c.fill();
+  c.fillStyle=sd;rr(-16,27,32,6,3);c.fill();
+  if(pl){ // open cockpit + driver with a ribbon
+    c.fillStyle='#4a2a42';rr(-11,-8,22,30,9);c.fill();
+    c.fillStyle='#3a2318';c.beginPath();c.ellipse(0,15,4,8,0,0,6.3);c.fill();          // ponytail
+    c.fillStyle='#fff';c.beginPath();c.ellipse(0,12,10,5,0,0,6.3);c.fill();             // shoulders
+    c.fillStyle='#3a2318';c.beginPath();c.arc(0,5,8.5,0,6.3);c.fill();                   // hair
+    c.fillStyle='#ff3d8b';c.strokeStyle='#fff';c.lineWidth=1.2;                          // ribbon bow
+    c.beginPath();c.moveTo(0,2);c.lineTo(-12,-4);c.lineTo(-12,8);c.closePath();c.fill();c.stroke();
+    c.beginPath();c.moveTo(0,2);c.lineTo(12,-4);c.lineTo(12,8);c.closePath();c.fill();c.stroke();
+    c.beginPath();c.arc(0,2,3.2,0,6.3);c.fill();c.stroke();
+  }else{c.fillStyle='#3a2f4a';rr(-11,-16,22,11,4);c.fill();c.fillStyle='rgba(255,255,255,.35)';rr(-11,-3,22,18,6);c.fill()}
+  c.restore();
+}
+function tree(x,y){c.fillStyle='rgba(120,40,80,.15)';c.beginPath();c.arc(x+4,y+5,24,0,6.3);c.fill();
+  c.fillStyle='#ff9fc5';c.beginPath();c.arc(x,y,24,0,6.3);c.fill();c.fillStyle='#ffc2da';c.beginPath();c.arc(x-6,y-6,15,0,6.3);c.fill();c.fillStyle='#fff0f6';c.beginPath();c.arc(x-9,y-9,6,0,6.3);c.fill()}
+function draw(){
+  c.setTransform(K,0,0,K,0,0);c.fillStyle='#ffcfe0';c.fillRect(0,0,W,H);
+  c.save();if(shake>0)c.translate((R()-.5)*6,(R()-.5)*6);
+  const cx=W/2,x0=cx-RW/2,top=P.y+PS,bot=P.y+PS-H;
+  c.fillStyle='#7b5a74';c.fillRect(x0,0,RW,H);
+  for(let y=Math.floor(bot/60)*60;y<=top+60;y+=60){
+    const i=y/60,s=sy(y);
+    c.fillStyle=i%2?'#ff9cc2':'#fffafa';c.fillRect(x0-10,s-60,10,60);c.fillRect(x0+RW,s-60,10,60);
+    c.fillStyle='rgba(255,255,255,.7)';c.fillRect(cx-RW/6-2,s-45,4,28);c.fillRect(cx+RW/6-2,s-45,4,28);
+    if(i%2===0){const hh=((i*9301+49297)%233280)/233280,side=(i/2)%2?1:-1;tree(cx+side*(RW/2+42+hh*40),s-30)}
+  }
+  c.fillStyle='rgba(255,255,255,.6)';c.fillRect(x0,sy(0)-3,RW,6);
+  const fy=sy(L);if(fy>-40&&fy<H+40)for(let r=0;r<2;r++)for(let q=0;q<Math.ceil(RW/14);q++){c.fillStyle=(q+r)%2?'#fffafa':'#3a2a40';c.fillRect(x0+q*14,fy-28+r*14,14,14)}
+  for(const o of obs){const s=sy(o.y);if(o.h||s<-20||s>H+20)continue;const x=cx+o.x;
+    c.fillStyle='#ff9f43';c.beginPath();c.arc(x,s,11,0,6.3);c.fill();c.fillStyle='#fff';c.beginPath();c.arc(x,s,6.5,0,6.3);c.fill();c.fillStyle='#ff9f43';c.beginPath();c.arc(x,s,3,0,6.3);c.fill()}
+  c.font='28px serif';c.textAlign='center';c.textBaseline='middle';
+  for(const h of hts){const s=sy(h.y);if(h.got||s<-30||s>H+30)continue;c.save();c.translate(cx+h.x,s);c.scale(1+Math.sin(tm*5)*.1,1+Math.sin(tm*5)*.1);c.fillText('💗',0,0);c.restore()}
+  for(const p of part){c.globalAlpha=Math.min(1,p.life*2.5);c.fillStyle=p.col;c.beginPath();c.arc(cx+p.x,sy(p.y),p.s,0,6.3);c.fill()}c.globalAlpha=1;
+  [...cars].sort((a,b)=>a.y-b.y).forEach(r=>{const s=sy(r.y);if(s>-70&&s<H+70)car(cx+r.x,s,r.col,r.sd,r.player?r.ang:Math.cos(tm*.9+(r.ph||0))*.06,r.player)});
+  c.restore();c.textAlign='center';c.textBaseline='middle';
+  // HUD: progress bar + position
+  c.fillStyle='rgba(255,255,255,.65)';rr(20,16,320,14,7);c.fill();
+  c.font='16px serif';c.fillText('🏁',334,23);
+  cars.forEach(r=>{const x=20+Math.min(1,r.y/L)*300;c.fillStyle=r.col;c.strokeStyle='#fff';c.lineWidth=2;c.beginPath();c.arc(x+6,23,r.player?8:5.5,0,6.3);c.fill();c.stroke()});
+  const rank=1+cars.filter(r=>!r.player&&r.y>P.y).length;
+  c.font='italic 600 22px Cormorant Garamond,Georgia,serif';c.fillStyle='#fffafa';c.shadowColor='#d94f83';c.shadowBlur=8;
+  c.fillText(['','1st','2nd','3rd','4th'][rank]+' place',W/2,52);
+  if(st==='count'||cd>0){const t=cd>2.8?'3':cd>1.8?'2':cd>.8?'1':'GO!';
+    c.font='italic 600 110px Cormorant Garamond,Georgia,serif';c.fillStyle='#fffafa';c.shadowBlur=24;c.fillText(t,W/2,H*.4)}
+  c.shadowBlur=0;
+}
+let lt=performance.now();
+(function loop(t){const dt=Math.min(.05,(t-lt)/1000);lt=t;upd(dt);draw();requestAnimationFrame(loop)})(lt);
+
+/* ---------- win: big peony reveal ---------- */
+function doWin(){
+  const cols=['#ffd1e3','#ffb3d0','#ff8fb8','#f2679b','#d94f83'],rings=[[9,100],[8,82],[7,64],[6,46],[5,28]];let s='';
+  for(let a=0;a<6;a++)s+=`<ellipse cy="-112" rx="18" ry="40" transform="rotate(${a*60+30})" fill="${a%2?'#5f9d73':'#7fb68a'}"/>`;
+  rings.forEach(([n,r],ri)=>{s+=`<g class="ring" style="--d:${ri*.3}s">`;
+    for(let j=0;j<n;j++)s+=`<ellipse cy="${-r*.52}" rx="${r*.43}" ry="${r*.56}" transform="rotate(${(j+(ri%2)*.5)*360/n})" fill="${cols[ri]}" stroke="rgba(217,79,131,.3)" stroke-width="1"/>`;s+='</g>'});
+  s+='<g class="ring" style="--d:1.5s">'+Array.from({length:12},(_,i)=>`<circle cx="${Math.cos(i*.52)*9}" cy="${Math.sin(i*.52)*9}" r="3.5" fill="#ffe38a"/>`).join('')+'</g>';
+  $('#pv').innerHTML=s;$('#win').classList.add('on');
+  for(let i=0;i<30;i++){const e=document.createElement('div');e.className='pe';e.style.cssText=`left:${R()*100}%;background:${['#ff9cc2','#ffb6d2','#ff8fb8','#fff0f6'][i%4]};animation-duration:${4+R()*5}s;animation-delay:${-R()*8}s`;$('#win').appendChild(e)}
+  setTimeout(()=>$('#wt').classList.add('v'),600);
+  setTimeout(()=>$('#wm').classList.add('v'),3200);
+  setTimeout(()=>$('#again2').classList.add('v'),5200);
+}
+</script>
+</body>
+</html>
